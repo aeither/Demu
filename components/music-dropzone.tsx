@@ -5,6 +5,7 @@ import { ThirdwebStorage } from "@thirdweb-dev/storage"
 import { Howl, Howler } from "howler"
 import { useDropzone } from "react-dropzone"
 
+import useStore from "@/lib/store"
 import { Input } from "@/components/ui/input"
 import { Button } from "./ui/button"
 
@@ -15,6 +16,7 @@ export function MusicDropzone({ className, ...props }: UploadMusicProps) {
   const [music, setMusic] = React.useState<Howl>()
   const storage = new ThirdwebStorage()
   const { mutateAsync: upload } = useStorageUpload()
+  const { setMusicUrl } = useStore()
 
   const onCoverDrop = React.useCallback(
     async (acceptedFiles: File[]) => {
@@ -27,6 +29,7 @@ export function MusicDropzone({ className, ...props }: UploadMusicProps) {
       const sound = new Howl({
         src: [url],
       })
+      setMusicUrl(url)
       setMusic(sound)
 
       setLoading(false)

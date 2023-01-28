@@ -64,7 +64,8 @@
     "sharp": "^0.31.3",
     "tailwind-merge": "^1.8.0",
     "tailwindcss-animate": "^1.0.5",
-    "wavesurfer.js": "^6.4.0"
+    "wavesurfer.js": "^6.4.0",
+    "zustand": "^4.3.2"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^3.7.1",

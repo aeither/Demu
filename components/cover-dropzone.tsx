@@ -4,35 +4,31 @@ import { useStorageUpload } from "@thirdweb-dev/react"
 import { ThirdwebStorage } from "@thirdweb-dev/storage"
 import { useDropzone } from "react-dropzone"
 
+import useStore from "@/lib/store"
 import { Input } from "@/components/ui/input"
 
 interface UploadMusicProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function CoverDropzone({ className, ...props }: UploadMusicProps) {
-  const [loading, setLoading] = React.useState(false)
-  const [cover, setCover] = React.useState("")
+  const { cover, setCover } = useStore()
   const storage = new ThirdwebStorage()
-  const { mutateAsync: upload } = useStorageUpload()
+  const { mutateAsync: upload, isLoading } = useStorageUpload()
 
-  const onCoverDrop = React.useCallback(
+  const onDrop = React.useCallback(
     async (acceptedFiles: File[]) => {
-      setLoading(true)
-
       const uris = await upload({ data: acceptedFiles })
       console.log(uris)
 
-      const url = await storage.resolveScheme(uris[0])
+      const url = storage.resolveScheme(uris[0])
       setCover(url)
-
-      setLoading(false)
     },
     [upload]
   )
-  const { getRootProps, getInputProps } = useDropzone({ onDrop: onCoverDrop })
+  const { getRootProps, getInputProps } = useDropzone({ onDrop })
 
   return (
     <>
-      {loading ? (
+      {isLoading ? (
         <p>Loading...</p>
       ) : (
         <div className="rounded border border-dashed p-4" {...getRootProps()}>

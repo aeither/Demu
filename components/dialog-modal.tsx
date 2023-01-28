@@ -1,11 +1,9 @@
 import * as React from "react"
-import Image from "next/image"
-import { ConnectWallet, useStorageUpload } from "@thirdweb-dev/react"
-import { ThirdwebStorage } from "@thirdweb-dev/storage"
 import { Plus } from "lucide-react"
-import { useDropzone } from "react-dropzone"
+import { useSession } from "next-auth/react"
 import { useForm } from "react-hook-form"
 
+import useStore from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,20 +23,43 @@ import { MusicDropzone } from "./music-dropzone"
 interface UploadMusicProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function DialogModal({ className, ...props }: UploadMusicProps) {
-  const [loading, setLoading] = React.useState(false)
-  const [cover, setCover] = React.useState("")
+  const { cover, musicUrl } = useStore()
+  const [open, setOpen] = React.useState(false)
 
+  const { data: sessionData } = useSession()
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm()
-  const onSubmit = (data) => console.log(data)
+  const onSubmit = async (data) => {
+    const body = JSON.stringify({
+      album: String(data.album),
+      author: String(data.author),
+      thumb: cover,
+      title: String(data.title),
+      url: musicUrl,
+      userId: String((sessionData.user as any).id),
+    })
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body,
+    }
+
+    const res = await fetch("/api/server", options)
+      .then((response) => response.json())
+      .catch((err) => console.error(err))
+    console.log("🚀 ~ file: dialog-modal.tsx:40 ~ onSubmit ~ res", res.data)
+    setOpen(false)
+  }
   console.log(errors)
 
   return (
     <div className={cn("space-y-3", className)} {...props}>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger>
           <Button size="sm" className="relative">
             <Plus className="mr-2 h-4 w-4" />
@@ -53,26 +74,32 @@ export function DialogModal({ className, ...props }: UploadMusicProps) {
             </DialogDescription>
           </DialogHeader>
           <CoverDropzone />
-          
+
           <MusicDropzone />
           <form onSubmit={handleSubmit(onSubmit)}>
-            <input
+            <Label htmlFor="">Title</Label>
+            <Input
               type="text"
               placeholder="Title"
               {...register("title", { required: true, maxLength: 40 })}
             />
-            <input
+            <Label htmlFor="">Album</Label>
+            <Input
               type="text"
               placeholder="album"
               {...register("album", { required: true, maxLength: 40 })}
             />
-            <input
+            <Label htmlFor="">Author</Label>
+            <Input
               type="text"
               placeholder="author"
               {...register("author", { required: true, maxLength: 100 })}
             />
-
-            <input type="submit" />
+            <div className="mt-4">
+              <Button className="block  w-full" type="submit">
+                Submit
+              </Button>
+            </div>
           </form>
           <DialogFooter>{/* <Button>Import Podcast</Button> */}</DialogFooter>
         </DialogContent>
