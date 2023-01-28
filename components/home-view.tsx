@@ -2,14 +2,17 @@ import * as React from "react"
 import Image from "next/image"
 import {
   Activity,
+  Airplay,
   Album,
   CreditCard,
+  Heart,
   Home,
   Keyboard,
   Library,
   ListMusic,
   LogOut,
   Mail,
+  Maximize2,
   MessageSquare,
   Mic2,
   Music2,
@@ -23,6 +26,7 @@ import {
   User,
   UserPlus,
   Users,
+  Volume2,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -67,8 +71,8 @@ import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ClientOnly from "./client-only"
-import { LinearCMDK } from "./linear"
 import { ThemeToggle } from "./theme-toggle"
+import { Progress } from "./ui/progress"
 
 const playlists = [
   "Recently Added",
@@ -302,7 +306,6 @@ export function HomeView() {
                     </TabsTrigger>
                   </TabsList>
                   <div className="ml-auto mr-4 flex gap-4">
-                    <LinearModal />
                     <DialogModal />
                     <ThemeToggle />
                   </div>
@@ -433,9 +436,53 @@ export function HomeView() {
             </div>
           </div>
         </div>
+        <div className="absolute bottom-0 h-20 w-screen bg-black border-t border-t-slate-200 dark:border-t-slate-700">
+          <div className="flex justify-between items-center h-full p-4">
+            <div className="flex items-center gap-4">
+              <div>
+                <h3 className="font-medium leading-none">Stateful Symphony</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Nina Netcode
+                </p>
+              </div>
+              <Heart className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="flex justify-between">
+                <p className="text-sm text-slate-700 dark:text-slate-500">
+                  0:00
+                </p>
+                <p className="text-sm text-slate-700 dark:text-slate-500">
+                  3:29
+                </p>
+              </div>
+              <PlaybackProgress />
+            </div>
+            <div>
+              <div className="flex gap-2">
+                <Mic2 className="h-4 w-4 text-slate-700 dark:text-slate-500" />
+                <ListMusic className="h-4 w-4 text-slate-700 dark:text-slate-500" />
+                <Airplay className="h-4 w-4 text-slate-700 dark:text-slate-500" />
+                <Volume2 className="h-4 w-4 text-slate-700 dark:text-slate-500" />
+                <Maximize2 className="h-4 w-4 text-slate-700 dark:text-slate-500" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </ClientOnly>
   )
+}
+
+function PlaybackProgress() {
+  const [progress, setProgress] = React.useState(13)
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500)
+    return () => clearTimeout(timer)
+  }, [])
+
+  return <Progress value={progress} className="w-[280px]" />
 }
 
 interface UploadMusicProps extends React.HTMLAttributes<HTMLDivElement> {}
