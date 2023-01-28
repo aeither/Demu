@@ -10,7 +10,8 @@
     "lint": "next lint",
     "preview": "next build && next start",
     "prebuild": "prisma generate",
-    "predev": "prisma generate"
+    "predev": "prisma generate",
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.5",

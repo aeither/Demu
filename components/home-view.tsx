@@ -49,9 +49,9 @@ import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ClientOnly from "./client-only"
+import { DialogModal } from "./dialog-modal"
 import { ThemeToggle } from "./theme-toggle"
 import { Progress } from "./ui/progress"
-import { DialogModal } from "./dialog-modal"
 
 const playlists = [
   "Recently Added",
@@ -145,6 +145,7 @@ const madeForYouAlbums: Album[] = [
 export function HomeView() {
   const { data: session } = useSession()
   const { email, image } = session?.user || {}
+  const [selected, setSelected] = React.useState(0)
 
   return (
     <ClientOnly>
@@ -272,7 +273,17 @@ export function HomeView() {
               </div>
             </div>
           </aside>
-          <div className="col-span-3 border-l border-l-slate-200 bg-slate-100 dark:border-l-slate-700 dark:bg-black xl:col-span-5">
+          <div
+            className={cn(
+              "col-span-3 border-l border-l-slate-200 bg-slate-100 bg-opacity-0 bg-gradient-to-bl from-black via-black to-black transition duration-500 dark:border-l-slate-700 dark:bg-black xl:col-span-5",
+              selected === 0 && "bg-opacity-100 bg-gradient-to-bl from-red-600",
+              selected === 1 &&
+                "bg-opacity-100 bg-gradient-to-bl from-lime-600",
+              selected === 2 &&
+                "bg-opacity-100 bg-gradient-to-bl from-orange-600",
+              selected === 3 && "bg-opacity-100 bg-gradient-to-bl from-sky-600"
+            )}
+          >
             <div className="h-full px-8 py-6">
               <Tabs defaultValue="music" className="h-full space-y-6">
                 <div className="space-between flex items-center">
@@ -318,11 +329,13 @@ export function HomeView() {
                   </div>
                   <div className="relative pt-6">
                     <div className="relative flex space-x-4">
-                      {listenNowAlbums.map((album) => (
+                      {listenNowAlbums.map((album, index) => (
                         <AlbumArtwork
                           key={album.name}
                           album={album}
                           className="w-[250px]"
+                          onMouseOver={() => setSelected(index)}
+                          onMouseOut={() => setSelected(-1)}
                         />
                       ))}
                     </div>
@@ -352,8 +365,8 @@ export function HomeView() {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 h-20 w-screen bg-black border-t border-t-slate-200 dark:border-t-slate-700">
-          <div className="flex justify-between items-center h-full p-4">
+        <div className="absolute bottom-0 h-20 w-screen border-t border-t-slate-200 bg-black dark:border-t-slate-700">
+          <div className="flex h-full items-center justify-between p-4">
             <div className="flex items-center gap-4">
               <div>
                 <h3 className="font-medium leading-none">Stateful Symphony</h3>
@@ -402,7 +415,6 @@ function PlaybackProgress() {
 }
 
 interface UploadMusicProps extends React.HTMLAttributes<HTMLDivElement> {}
-
 
 function SignInModal({ className, ...props }: UploadMusicProps) {
   return (
