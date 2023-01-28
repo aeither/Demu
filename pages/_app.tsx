@@ -1,5 +1,8 @@
 import type { AppProps } from "next/app"
 import { Inter as FontSans } from "@next/font/google"
+import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react"
+import type { Session } from "next-auth"
+import { SessionProvider } from "next-auth/react"
 import { ThemeProvider } from "next-themes"
 
 import "@/styles/globals.css"
@@ -11,7 +14,10 @@ const fontSans = FontSans({
   variable: "--font-sans",
 })
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppProps<{ session: Session }>) {
   return (
     <>
       <style jsx global>{`
@@ -20,7 +26,11 @@ export default function App({ Component, pageProps }: AppProps) {
 				}
 			}`}</style>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <Component {...pageProps} />
+        <SessionProvider session={session}>
+          <ThirdwebProvider desiredChainId={ChainId.Mumbai}>
+            <Component {...pageProps} />
+          </ThirdwebProvider>
+        </SessionProvider>
       </ThemeProvider>
     </>
   )

@@ -4,16 +4,11 @@ import {
   Activity,
   Airplay,
   Album,
-  CreditCard,
   Heart,
   Home,
-  Keyboard,
   Library,
   ListMusic,
-  LogOut,
-  Mail,
   Maximize2,
-  MessageSquare,
   Mic2,
   Music2,
   PlayCircle,
@@ -21,17 +16,14 @@ import {
   PlusCircle,
   Radio,
   Search,
-  Settings,
   ShoppingCart,
   User,
-  UserPlus,
-  Users,
   Volume2,
 } from "lucide-react"
+import { signIn, useSession } from "next-auth/react"
 
 import { cn } from "@/lib/utils"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
   ContextMenu,
@@ -52,20 +44,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
@@ -73,6 +51,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ClientOnly from "./client-only"
 import { ThemeToggle } from "./theme-toggle"
 import { Progress } from "./ui/progress"
+import { DialogModal } from "./dialog-modal"
 
 const playlists = [
   "Recently Added",
@@ -164,6 +143,9 @@ const madeForYouAlbums: Album[] = [
 ]
 
 export function HomeView() {
+  const { data: session } = useSession()
+  const { email, image } = session?.user || {}
+
   return (
     <ClientOnly>
       <div className="relative h-screen rounded-md bg-white shadow-2xl transition-all dark:bg-slate-900">
@@ -306,91 +288,25 @@ export function HomeView() {
                     </TabsTrigger>
                   </TabsList>
                   <div className="ml-auto mr-4 flex gap-4">
-                    <DialogModal />
                     <ThemeToggle />
+                    <DialogModal />
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="relative h-10 w-10 rounded-full"
-                      >
-                        <Avatar>
-                          <AvatarImage
-                            src="https://github.com/aeither.png"
-                            alt="@aeither"
-                          />
-                          <AvatarFallback>SC</AvatarFallback>
-                        </Avatar>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      className="w-56"
-                      align="end"
-                      forceMount
-                    >
-                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Profile</span>
-                          <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          <span>Billing</span>
-                          <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Settings className="mr-2 h-4 w-4" />
-                          <span>Settings</span>
-                          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Keyboard className="mr-2 h-4 w-4" />
-                          <span>Keyboard shortcuts</span>
-                          <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-                        </DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                          <Users className="mr-2 h-4 w-4" />
-                          <span>Team</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            <span>Invite users</span>
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuPortal>
-                            <DropdownMenuSubContent forceMount>
-                              <DropdownMenuItem>
-                                <Mail className="mr-2 h-4 w-4" />
-                                <span>Email</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <MessageSquare className="mr-2 h-4 w-4" />
-                                <span>Message</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem>
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                <span>More...</span>
-                              </DropdownMenuItem>
-                            </DropdownMenuSubContent>
-                          </DropdownMenuPortal>
-                        </DropdownMenuSub>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>Log out</span>
-                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div>
+                    {!session && !email ? (
+                      <SignInModal />
+                    ) : (
+                      <Image
+                        alt={email}
+                        width={40}
+                        height={40}
+                        src={
+                          "https://avatars.dicebear.com/api/micah/" +
+                          email +
+                          ".svg"
+                        }
+                      />
+                    )}
+                  </div>
                 </div>
                 <TabsContent value="music" className="border-none p-0">
                   <div className="flex items-center justify-between">
@@ -487,48 +403,25 @@ function PlaybackProgress() {
 
 interface UploadMusicProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-function DialogModal({ className, ...props }: UploadMusicProps) {
+
+function SignInModal({ className, ...props }: UploadMusicProps) {
   return (
     <div className={cn("space-y-3", className)} {...props}>
       <Dialog>
         <DialogTrigger>
           <Button size="sm" className="relative">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Music
+            Sign in
           </Button>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Podcast</DialogTitle>
-            <DialogDescription>
-              Copy and paste the podcast feed URL to import.
-            </DialogDescription>
+            <DialogTitle>Sign In</DialogTitle>
+            <DialogDescription>Sign into your account.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="url">Podcast URL</Label>
-              <Input id="url" placeholder="https://example.com/feed.xml" />
-            </div>
+            <Button onClick={() => signIn("google")}>Sign in</Button>
           </div>
-          <DialogFooter>
-            <Button>Import Podcast</Button>
-          </DialogFooter>
         </DialogContent>
-      </Dialog>
-    </div>
-  )
-}
-
-function LinearModal({ className, ...props }: UploadMusicProps) {
-  return (
-    <div className={cn("space-y-3", className)} {...props}>
-      <Dialog>
-        <DialogTrigger>
-          <Button size="sm" className="relative">
-            <Plus className="mr-2 h-4 w-4" />O
-          </Button>
-        </DialogTrigger>
-        <DialogContent></DialogContent>
       </Dialog>
     </div>
   )

@@ -2,7 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["avatars.githubusercontent.com", "images.unsplash.com"],
+    domains: [
+      "lh3.googleusercontent.com",
+      "avatars.githubusercontent.com",
+      "images.unsplash.com",
+      "gateway.ipfscdn.io",
+    ],
   },
   experimental: {
     fontLoaders: [
