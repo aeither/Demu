@@ -65,9 +65,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ClientOnly from "./client-only"
+import { LinearCMDK } from "./linear"
 import { ThemeToggle } from "./theme-toggle"
 
 const playlists = [
@@ -159,10 +159,10 @@ const madeForYouAlbums: Album[] = [
   },
 ]
 
-export function AppleMusicDemo() {
+export function HomeView() {
   return (
     <ClientOnly>
-      <div className="h-screen rounded-md bg-white shadow-2xl transition-all dark:bg-slate-900">
+      <div className="relative h-screen rounded-md bg-white shadow-2xl transition-all dark:bg-slate-900">
         <div className="grid h-full grid-cols-5 xl:grid-cols-6">
           <aside className="pb-12 ">
             <div className="px-8 py-6">
@@ -302,6 +302,7 @@ export function AppleMusicDemo() {
                     </TabsTrigger>
                   </TabsList>
                   <div className="ml-auto mr-4 flex gap-4">
+                    <LinearModal />
                     <DialogModal />
                     <ThemeToggle />
                   </div>
@@ -466,6 +467,21 @@ function DialogModal({ className, ...props }: UploadMusicProps) {
             <Button>Import Podcast</Button>
           </DialogFooter>
         </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
+function LinearModal({ className, ...props }: UploadMusicProps) {
+  return (
+    <div className={cn("space-y-3", className)} {...props}>
+      <Dialog>
+        <DialogTrigger>
+          <Button size="sm" className="relative">
+            <Plus className="mr-2 h-4 w-4" />O
+          </Button>
+        </DialogTrigger>
+        <DialogContent></DialogContent>
       </Dialog>
     </div>
   )
