@@ -25,6 +25,7 @@ import {
 } from "lucide-react"
 import { signIn, useSession } from "next-auth/react"
 
+import { abi } from "@/lib/abi"
 import useStore from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
@@ -53,7 +54,6 @@ import ClientOnly from "./client-only"
 import { DialogModal } from "./dialog-modal"
 import { ThemeToggle } from "./theme-toggle"
 import { Slider } from "./ui/slider"
-import { abi } from "@/lib/abi"
 
 const playlists = [
   "Recently Added",
@@ -69,6 +69,7 @@ const playlists = [
 interface Album {
   title: string
   author: string
+  url: string
   thumb: string
 }
 
@@ -76,24 +77,28 @@ const listenNowAlbums: Album[] = [
   {
     title: "Echoes of Dragonsfire",
     author: "Lyra Elwyn",
+    url: "https://gateway.ipfscdn.io/ipfs/QmPJJGQAvLy2j1F4mL5bVZgWAT1vMqFphBF1yxkVPc3c3p/SIIK%20%26%20Alenn%20-%20Mess%20%5BNCS%20Release%5D.mp3",
     thumb:
       "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/51d25146-34b0-4fb5-8cbf-1c78681c1272",
   },
   {
     title: "Rhapsody of the Forgotten Realm",
     author: "Evangeline Rosewood",
+    url: "https://gateway.ipfscdn.io/ipfs/QmcB1ZyoH8JMTiNE9C36A5TMvTkfRraTyETGLXD9MRR8Hy/ROY%20KNOX%20%26%20CRVN%20-%20The%20Other%20Side%20%5BNCS%20Release%5D.mp3",
     thumb:
       "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/c9af7ad3-f799-4b58-9f8c-fd23e81ae0d9",
   },
   {
     title: "The Shadow Symphony",
     author: "Raven Blackwood",
+    url: "https://gateway.ipfscdn.io/ipfs/QmfNHNwYuacR93pCGj4XcTHVVK1Xd9E1nWBApeWYA71dko/if%20found%20x%20n%C3%B8ll%20-%20die%204%20u%20(feat.%20damnboy!)%20%5BNCS%20Release%20-%20Music%20Video%5D.mp3",
     thumb:
       "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/d99afe31-5d55-4c16-aba4-2f8b48927d16",
   },
   {
     title: "Whispers of the Elemental Kingdom",
     author: "Thorne Wilder",
+    url: "https://gateway.ipfscdn.io/ipfs/QmVBFffUzeEWXQHYJ2nX3mj8t26iVEon2bVzh7GYgGkgTq/Cartoon%20-%20On%20%26%20On%20(feat.%20Daniel%20Levi)%20%5BNCS%20Release%5D.mp3",
     thumb:
       "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/31d6f736-98a1-4ea8-9689-a2dde4205a20",
   },
@@ -103,8 +108,7 @@ export function HomeView() {
   const { data: session } = useSession()
   const { email, image } = session?.user || {}
   const [selected, setSelected] = React.useState(0)
-  const { currentPlaying, playingHowler, setCurrentPlaying, setPlayingHowler } =
-    useStore()
+  const { currentPlaying } = useStore()
 
   const { data: musics } = useQuery({
     queryKey: ["musics", (session?.user as any)?.id || ""],
@@ -367,7 +371,9 @@ export function HomeView() {
               </div>
               <div>
                 <h3 className="font-medium leading-none">
-                  {currentPlaying ? currentPlaying.name : "Echoes of Dragonsfire"}
+                  {currentPlaying
+                    ? currentPlaying.name
+                    : "Echoes of Dragonsfire"}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   {currentPlaying ? currentPlaying.artist : "Lyra Elwyn"}
@@ -455,7 +461,7 @@ function SignInModal({ className, ...props }: UploadMusicProps) {
 function MintModal({ className, ...props }: UploadMusicProps) {
   const { currentPlaying } = useStore()
   const address = useAddress()
-  
+
   return (
     <div className={cn("space-y-3", className)} {...props}>
       <Dialog>
@@ -475,7 +481,10 @@ function MintModal({ className, ...props }: UploadMusicProps) {
                 if (!currentPlaying) return
 
                 const { artist, cover, url, name } = currentPlaying
-                console.log("🚀 ~ file: home-view.tsx:478 ~ action={ ~ currentPlaying", currentPlaying)
+                console.log(
+                  "🚀 ~ file: home-view.tsx:478 ~ action={ ~ currentPlaying",
+                  currentPlaying
+                )
                 const tx = await contract.call(
                   "safeMint",
                   address,
