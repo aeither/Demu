@@ -1,6 +1,12 @@
 import * as React from "react"
 import Image from "next/image"
 import {
+  QueryFunctionContext,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query"
+import { Howl } from "howler"
+import {
   Activity,
   Airplay,
   Album,
@@ -22,6 +28,7 @@ import {
 } from "lucide-react"
 import { signIn, useSession } from "next-auth/react"
 
+import useStore from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Button } from "@/components/ui/button"
@@ -52,6 +59,7 @@ import ClientOnly from "./client-only"
 import { DialogModal } from "./dialog-modal"
 import { ThemeToggle } from "./theme-toggle"
 import { Progress } from "./ui/progress"
+import { Slider } from "./ui/slider"
 
 const playlists = [
   "Recently Added",
@@ -65,79 +73,34 @@ const playlists = [
 ]
 
 interface Album {
-  name: string
-  artist: string
-  cover: string
+  title: string
+  author: string
+  thumb: string
 }
 
 const listenNowAlbums: Album[] = [
   {
-    name: "Async Awakenings",
-    artist: "Nina Netcode",
-    cover:
+    title: "Async Awakenings",
+    author: "Nina Netcode",
+    thumb:
       "https://images.unsplash.com/photo-1547355253-ff0740f6e8c1?w=300&dpr=2&q=80",
   },
   {
-    name: "The Art of Reusability",
-    artist: "Lena Logic",
-    cover:
+    title: "The Art of Reusability",
+    author: "Lena Logic",
+    thumb:
       "https://images.unsplash.com/photo-1576075796033-848c2a5f3696?w=300&dpr=2&q=80",
   },
   {
-    name: "Stateful Symphony",
-    artist: "Beth Binary",
-    cover:
+    title: "Stateful Symphony",
+    author: "Beth Binary",
+    thumb:
       "https://images.unsplash.com/photo-1606542758304-820b04394ac2?w=300&dpr=2&q=80",
   },
   {
-    name: "React Rendezvous",
-    artist: "Ethan Byte",
-    cover:
-      "https://images.unsplash.com/photo-1598295893369-1918ffaf89a2?w=300&dpr=2&q=80",
-  },
-]
-
-const madeForYouAlbums: Album[] = [
-  {
-    name: "Async Awakenings",
-    artist: "Nina Netcode",
-    cover:
-      "https://images.unsplash.com/photo-1580428180098-24b353d7e9d9?w=300&dpr=2&q=80",
-  },
-  {
-    name: "Stateful Symphony",
-    artist: "Beth Binary",
-    cover:
-      "https://images.unsplash.com/photo-1606542758304-820b04394ac2?w=300&dpr=2&q=80",
-  },
-  {
-    name: "Stateful Symphony",
-    artist: "Beth Binary",
-    cover:
-      "https://images.unsplash.com/photo-1598062548091-a6fb6a052562?w=300&dpr=2&q=80",
-  },
-  {
-    name: "The Art of Reusability",
-    artist: "Lena Logic",
-    cover:
-      "https://images.unsplash.com/photo-1626759486966-c067e3f79982?w=300&dpr=2&q=80",
-  },
-  {
-    name: "Thinking Components",
-    artist: "Lena Logic",
-    cover:
-      "https://images.unsplash.com/photo-1576075796033-848c2a5f3696?w=300&dpr=2&q=80",
-  },
-  {
-    name: "Functional Fury",
-    artist: "Beth Binary",
-    cover:
-      "https://images.unsplash.com/photo-1606542758304-820b04394ac2?w=300&dpr=2&q=80",
-  },
-  {
-    name: "React Rendezvous",
-    artist: "Ethan Byte",
-    cover:
+    title: "React Rendezvous",
+    author: "Ethan Byte",
+    thumb:
       "https://images.unsplash.com/photo-1598295893369-1918ffaf89a2?w=300&dpr=2&q=80",
   },
 ]
@@ -146,6 +109,19 @@ export function HomeView() {
   const { data: session } = useSession()
   const { email, image } = session?.user || {}
   const [selected, setSelected] = React.useState(0)
+  const { currentPlaying, playingHowler, setCurrentPlaying, setPlayingHowler } =
+    useStore()
+
+  const { data: musics } = useQuery({
+    queryKey: ["musics", (session?.user as any)?.id || ""],
+    queryFn: async ({
+      queryKey,
+    }: QueryFunctionContext<[string, string | undefined]>) => {
+      const [_key, id] = queryKey
+      if (!id) return
+      return await fetch(`/api/musics/?id=${id}`).then((data) => data.json())
+    },
+  })
 
   return (
     <ClientOnly>
@@ -329,10 +305,10 @@ export function HomeView() {
                   </div>
                   <div className="relative pt-6">
                     <div className="relative flex space-x-4">
-                      {listenNowAlbums.map((album, index) => (
+                      {listenNowAlbums.map((asset, index) => (
                         <AlbumArtwork
-                          key={album.name}
-                          album={album}
+                          key={asset.title}
+                          asset={asset}
                           className="w-[250px]"
                           onMouseOver={() => setSelected(index)}
                           onMouseOut={() => setSelected(-1)}
@@ -348,14 +324,15 @@ export function HomeView() {
                   <div className="relative pt-6">
                     <ScrollArea>
                       <div className="flex space-x-4 pb-4">
-                        {madeForYouAlbums.map((album) => (
-                          <AlbumArtwork
-                            key={album.name}
-                            album={album}
-                            className="w-[150px]"
-                            aspectRatio={1 / 1}
-                          />
-                        ))}
+                        {musics &&
+                          musics.data.map((asset) => (
+                            <AlbumArtwork
+                              key={asset.id}
+                              asset={asset}
+                              className="w-[150px]"
+                              aspectRatio={1 / 1}
+                            />
+                          ))}
                       </div>
                       <ScrollBar orientation="horizontal" />
                     </ScrollArea>
@@ -368,10 +345,34 @@ export function HomeView() {
         <div className="absolute bottom-0 h-20 w-screen border-t border-t-slate-200 bg-black dark:border-t-slate-700">
           <div className="flex h-full items-center justify-between p-4">
             <div className="flex items-center gap-4">
+              <div className="relative h-14 w-14">
+                <AspectRatio
+                  ratio={1 / 1}
+                  className="overflow-hidden rounded-full"
+                >
+                  <Image
+                    src={
+                      currentPlaying
+                        ? currentPlaying.cover
+                        : "https://github.com/aeither.png"
+                    }
+                    fill
+                    className={cn(
+                      currentPlaying &&
+                        currentPlaying.isPlaying &&
+                        "animate-spin"
+                    )}
+                    alt="NJ logo"
+                    priority
+                  />
+                </AspectRatio>
+              </div>
               <div>
-                <h3 className="font-medium leading-none">Stateful Symphony</h3>
+                <h3 className="font-medium leading-none">
+                  {currentPlaying ? currentPlaying.name : "Stateful Symphony"}
+                </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Nina Netcode
+                  {currentPlaying ? currentPlaying.artist : "Nina Netcode"}
                 </p>
               </div>
               <Heart className="h-4 w-4" />
@@ -411,7 +412,14 @@ function PlaybackProgress() {
     return () => clearTimeout(timer)
   }, [])
 
-  return <Progress value={progress} className="w-[280px]" />
+  return (
+    <Slider
+      defaultValue={[progress]}
+      max={100}
+      step={1}
+      className="w-[280px]"
+    />
+  )
 }
 
 interface UploadMusicProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -440,16 +448,19 @@ function SignInModal({ className, ...props }: UploadMusicProps) {
 }
 
 interface AlbumArtworkProps extends React.HTMLAttributes<HTMLDivElement> {
-  album: Album
   aspectRatio?: number
+  asset: any
 }
 
 function AlbumArtwork({
-  album,
+  asset,
   aspectRatio = 3 / 4,
   className,
   ...props
 }: AlbumArtworkProps) {
+  const { currentPlaying, playingHowler, setCurrentPlaying, setPlayingHowler } =
+    useStore()
+
   return (
     <div className={cn("group space-y-3", className)} {...props}>
       <ContextMenu>
@@ -457,7 +468,55 @@ function AlbumArtwork({
           <div className="relative">
             <div className="absolute bottom-0 right-0 z-20">
               <div className="text-clip p-1">
-                <PlayCircle className="h-12 w-12 translate-y-4 rounded-full bg-slate-900 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100" />
+                <PlayCircle
+                  onClick={() => {
+                    // if click again the same track
+                    if (
+                      currentPlaying &&
+                      currentPlaying.isPlaying &&
+                      currentPlaying.url === asset.url
+                    ) {
+                      playingHowler.pause()
+                      setCurrentPlaying({
+                        ...currentPlaying,
+                        isPlaying: false,
+                      })
+                      return
+                    } else if (
+                      currentPlaying &&
+                      !currentPlaying.isPlaying &&
+                      currentPlaying.url === asset.url
+                    ) {
+                      playingHowler.play()
+                      setCurrentPlaying({
+                        ...currentPlaying,
+                        isPlaying: true,
+                      })
+                      return
+                    }
+
+                    if (playingHowler)
+                      // If click another music, stop last track
+                      playingHowler.stop()
+
+                    // If first time
+                    const sound = new Howl({
+                      src: [asset.url],
+                    })
+                    setPlayingHowler(sound)
+                    sound.play()
+                    setCurrentPlaying({
+                      isPlaying: true,
+                      url: asset.url,
+                      name: asset.title,
+                      artist: asset.author,
+                      cover: asset.thumb,
+                    })
+
+                    console.log(asset.url)
+                  }}
+                  className="h-12 w-12 translate-y-4 rounded-full bg-slate-900 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100"
+                />
               </div>
             </div>
             <AspectRatio
@@ -465,8 +524,8 @@ function AlbumArtwork({
               className="overflow-hidden rounded-md"
             >
               <Image
-                src={album.cover}
-                alt={album.name}
+                src={asset?.thumb}
+                alt={asset?.title}
                 fill
                 className="object-cover transition-all group-hover:scale-105"
               />
@@ -500,9 +559,9 @@ function AlbumArtwork({
         </ContextMenuContent>
       </ContextMenu>
       <div className="space-y-1 text-sm">
-        <h3 className="font-medium leading-none">{album.name}</h3>
+        <h3 className="font-medium leading-none">{asset?.title}</h3>
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          {album.artist}
+          {asset?.author}
         </p>
       </div>
     </div>

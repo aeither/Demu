@@ -7,6 +7,7 @@ const nextConfig = {
       "avatars.githubusercontent.com",
       "images.unsplash.com",
       "gateway.ipfscdn.io",
+      "github.com",
     ],
   },
   experimental: {

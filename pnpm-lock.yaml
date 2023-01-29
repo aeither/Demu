@@ -30,6 +30,7 @@ specifiers:
   '@radix-ui/react-tabs': ^1.0.2
   '@radix-ui/react-toggle-group': ^1.0.1
   '@radix-ui/react-tooltip': ^1.0.3
+  '@tanstack/react-query': ^4.23.0
   '@thirdweb-dev/auth': ^3.0.0
   '@thirdweb-dev/react': ^3.7.0
   '@thirdweb-dev/sdk': ^3.7.0
@@ -101,6 +102,7 @@ dependencies:
   '@radix-ui/react-tabs': 1.0.2_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-toggle-group': 1.0.2_biqbaboplfbrettd7655fr4n2y
   '@radix-ui/react-tooltip': 1.0.3_5ndqzdd6t4rivxsukjv3i3ak2q
+  '@tanstack/react-query': 4.23.0_biqbaboplfbrettd7655fr4n2y
   '@thirdweb-dev/auth': 3.0.0_fljsdpxdgw4m57anyxemdzybbm
   '@thirdweb-dev/react': 3.7.0_7lwpdujfwom5axjid2ce6ngcp4
   '@thirdweb-dev/sdk': 3.7.0_ethers@5.7.2
