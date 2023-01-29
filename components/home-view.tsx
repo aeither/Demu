@@ -1,6 +1,7 @@
 import * as React from "react"
 import Image from "next/image"
 import { QueryFunctionContext, useQuery } from "@tanstack/react-query"
+import { Web3Button, useAddress } from "@thirdweb-dev/react"
 import { Howl } from "howler"
 import {
   Activity,
@@ -17,10 +18,10 @@ import {
   PlusCircle,
   Radio,
   Search,
+  ShoppingBag,
   ShoppingCart,
   User,
   Volume2,
-  ShoppingBag
 } from "lucide-react"
 import { signIn, useSession } from "next-auth/react"
 
@@ -52,6 +53,7 @@ import ClientOnly from "./client-only"
 import { DialogModal } from "./dialog-modal"
 import { ThemeToggle } from "./theme-toggle"
 import { Slider } from "./ui/slider"
+import { abi } from "@/lib/abi"
 
 const playlists = [
   "Recently Added",
@@ -372,7 +374,7 @@ export function HomeView() {
                 </p>
               </div>
               <Heart className="h-4 w-4" />
-              <ShoppingBag className="h-4 w-4" onClick={mintMusic}/>
+              <MintModal />
             </div>
             <div>
               <div className="flex justify-between">
@@ -443,6 +445,50 @@ function SignInModal({ className, ...props }: UploadMusicProps) {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <Button onClick={() => signIn("google")}>Sign in</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
+function MintModal({ className, ...props }: UploadMusicProps) {
+  const { currentPlaying } = useStore()
+  const address = useAddress()
+  
+  return (
+    <div className={cn("space-y-3", className)} {...props}>
+      <Dialog>
+        <DialogTrigger>
+          <ShoppingBag className="h-4 w-4" />
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mint as NFT</DialogTitle>
+            {/* <DialogDescription>Sign into your account.</DialogDescription> */}
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Web3Button
+              contractAddress="0xf1a0BeF961286Bb2ad4F350325986318C398330F"
+              contractAbi={abi}
+              action={async (contract) => {
+                if (!currentPlaying) return
+
+                const { artist, cover, url, name } = currentPlaying
+                console.log("🚀 ~ file: home-view.tsx:478 ~ action={ ~ currentPlaying", currentPlaying)
+                const tx = await contract.call(
+                  "safeMint",
+                  address,
+                  name,
+                  artist,
+                  cover,
+                  url
+                )
+                const receipt = tx.receipt
+              }}
+            >
+              Mint NFT
+            </Web3Button>
           </div>
         </DialogContent>
       </Dialog>

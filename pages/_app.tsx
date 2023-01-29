@@ -30,7 +30,7 @@ export default function App({
 			}`}</style>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <SessionProvider session={session}>
-          <ThirdwebProvider desiredChainId={ChainId.Mumbai}>
+          <ThirdwebProvider desiredChainId={3141}>
             <QueryClientProvider client={queryClient}>
               <Component {...pageProps} />
             </QueryClientProvider>
