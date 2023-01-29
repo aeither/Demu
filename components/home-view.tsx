@@ -352,7 +352,7 @@ export function HomeView() {
                     src={
                       currentPlaying
                         ? currentPlaying.cover
-                        : "https://github.com/aeither.png"
+                        : "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/51d25146-34b0-4fb5-8cbf-1c78681c1272"
                     }
                     fill
                     className={cn(
@@ -367,10 +367,10 @@ export function HomeView() {
               </div>
               <div>
                 <h3 className="font-medium leading-none">
-                  {currentPlaying ? currentPlaying.name : "Stateful Symphony"}
+                  {currentPlaying ? currentPlaying.name : "Echoes of Dragonsfire"}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {currentPlaying ? currentPlaying.artist : "Nina Netcode"}
+                  {currentPlaying ? currentPlaying.artist : "Lyra Elwyn"}
                 </p>
               </div>
               <Heart className="h-4 w-4" />
