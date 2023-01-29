@@ -1,10 +1,6 @@
 import * as React from "react"
 import Image from "next/image"
-import {
-  QueryFunctionContext,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query"
+import { QueryFunctionContext, useQuery } from "@tanstack/react-query"
 import { Howl } from "howler"
 import {
   Activity,
@@ -18,13 +14,13 @@ import {
   Mic2,
   Music2,
   PlayCircle,
-  Plus,
   PlusCircle,
   Radio,
   Search,
   ShoppingCart,
   User,
   Volume2,
+  ShoppingBag
 } from "lucide-react"
 import { signIn, useSession } from "next-auth/react"
 
@@ -46,19 +42,15 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ClientOnly from "./client-only"
 import { DialogModal } from "./dialog-modal"
 import { ThemeToggle } from "./theme-toggle"
-import { Progress } from "./ui/progress"
 import { Slider } from "./ui/slider"
 
 const playlists = [
@@ -80,28 +72,28 @@ interface Album {
 
 const listenNowAlbums: Album[] = [
   {
-    title: "Async Awakenings",
-    author: "Nina Netcode",
+    title: "Echoes of Dragonsfire",
+    author: "Lyra Elwyn",
     thumb:
-      "https://images.unsplash.com/photo-1547355253-ff0740f6e8c1?w=300&dpr=2&q=80",
+      "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/51d25146-34b0-4fb5-8cbf-1c78681c1272",
   },
   {
-    title: "The Art of Reusability",
-    author: "Lena Logic",
+    title: "Rhapsody of the Forgotten Realm",
+    author: "Evangeline Rosewood",
     thumb:
-      "https://images.unsplash.com/photo-1576075796033-848c2a5f3696?w=300&dpr=2&q=80",
+      "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/c9af7ad3-f799-4b58-9f8c-fd23e81ae0d9",
   },
   {
-    title: "Stateful Symphony",
-    author: "Beth Binary",
+    title: "The Shadow Symphony",
+    author: "Raven Blackwood",
     thumb:
-      "https://images.unsplash.com/photo-1606542758304-820b04394ac2?w=300&dpr=2&q=80",
+      "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/d99afe31-5d55-4c16-aba4-2f8b48927d16",
   },
   {
-    title: "React Rendezvous",
-    author: "Ethan Byte",
+    title: "Whispers of the Elemental Kingdom",
+    author: "Thorne Wilder",
     thumb:
-      "https://images.unsplash.com/photo-1598295893369-1918ffaf89a2?w=300&dpr=2&q=80",
+      "https://lexica-serve-encoded-images2.sharif.workers.dev/full_jpg/31d6f736-98a1-4ea8-9689-a2dde4205a20",
   },
 ]
 
@@ -122,6 +114,10 @@ export function HomeView() {
       return await fetch(`/api/musics/?id=${id}`).then((data) => data.json())
     },
   })
+
+  const mintMusic = async () => {
+    // currentPlaying
+  }
 
   return (
     <ClientOnly>
@@ -376,6 +372,7 @@ export function HomeView() {
                 </p>
               </div>
               <Heart className="h-4 w-4" />
+              <ShoppingBag className="h-4 w-4" onClick={mintMusic}/>
             </div>
             <div>
               <div className="flex justify-between">
@@ -394,6 +391,12 @@ export function HomeView() {
                 <ListMusic className="h-4 w-4 text-slate-700 dark:text-slate-500" />
                 <Airplay className="h-4 w-4 text-slate-700 dark:text-slate-500" />
                 <Volume2 className="h-4 w-4 text-slate-700 dark:text-slate-500" />
+                <Slider
+                  defaultValue={[100]}
+                  max={100}
+                  step={1}
+                  className="w-[80px]"
+                />
                 <Maximize2 className="h-4 w-4 text-slate-700 dark:text-slate-500" />
               </div>
             </div>

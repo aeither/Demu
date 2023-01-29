@@ -8,6 +8,7 @@ const nextConfig = {
       "images.unsplash.com",
       "gateway.ipfscdn.io",
       "github.com",
+      "lexica-serve-encoded-images2.sharif.workers.dev",
     ],
   },
   experimental: {
