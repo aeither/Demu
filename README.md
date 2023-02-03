@@ -13,6 +13,10 @@
   Decentralized Audio Streaming
 <p>
 
+## Demo
+
+https://demu-phi.vercel.app/
+
 ## Overview
 
 ![demu_banner](https://user-images.githubusercontent.com/36173828/216666929-0b316e88-54dc-49cd-8bc9-b220375c6159.png)
